@@ -43,7 +43,7 @@ const moduleData = {
     dashboard: {
         title: 'Dashboard',
         content: `
-            <!-- Stats Cards Row -->
+            <div class="dashboard-shell">
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-icon stat-icon-members">
@@ -51,7 +51,7 @@ const moduleData = {
                     </div>
                     <div class="stat-info">
                         <span class="stat-number" id="statTotalMembers">0</span>
-                        <span class="stat-label">Total Members</span>
+                        <span class="stat-label">Members</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -60,7 +60,7 @@ const moduleData = {
                     </div>
                     <div class="stat-info">
                         <span class="stat-number" id="statActiveMembers">0</span>
-                        <span class="stat-label">Active Members</span>
+                        <span class="stat-label">Active</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -69,108 +69,71 @@ const moduleData = {
                     </div>
                     <div class="stat-info">
                         <span class="stat-number" id="statEarnings">₱0</span>
-                        <span class="stat-label">This Month Earnings</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-checkin">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-number" id="statCheckins">0</span>
-                        <span class="stat-label">Today's Check-ins</span>
+                        <span class="stat-label">Monthly Revenue</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon stat-icon-checkout">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
                     <div class="stat-info">
-                        <span class="stat-number" id="statCheckouts">0</span>
-                        <span class="stat-label">Today's Check-outs</span>
+                        <span class="stat-number" id="statExpiringMembers">0</span>
+                        <span class="stat-label">Expiring Soon</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: Recent Activity + Quick Actions + Membership Overview -->
             <div class="dashboard-bottom">
-                <!-- Recent Activity -->
                 <div class="dash-card recent-activity">
                     <div class="dash-card-header">
-                        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
-                        <a href="#" class="view-all">View All</a>
+                        <h3>Activity</h3>
                     </div>
                     <ul class="activity-list" id="activityList">
                         <li class="activity-item">
-                            <div class="activity-dot dot-checkin"></div>
+                            <div class="activity-dot dot-neutral"></div>
                             <div class="activity-info">
-                                <p>No recent activity</p>
-                                <span class="activity-time">—</span>
+                                <p>Loading overview</p>
+                                <span class="activity-time">Please wait</span>
                             </div>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="dash-card quick-actions">
-                    <div class="dash-card-header">
-                        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-                    </div>
-                    <div class="quick-actions-grid">
-                        <button class="quick-action-btn">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Add Member</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Record Attendance</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <i class="fas fa-credit-card"></i>
-                            <span>Process Payment</span>
-                        </button>
-                        <button class="quick-action-btn">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Generate Report</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Membership Overview -->
                 <div class="dash-card membership-overview">
                     <div class="dash-card-header">
-                        <h3><i class="fas fa-id-card"></i> Membership Overview</h3>
+                        <h3>Plans</h3>
                     </div>
-                    <div class="plan-stats">
+                    <div class="plan-stats compact-plan-stats">
                         <div class="plan-item">
                             <div class="plan-info">
                                 <span class="plan-name">Premium</span>
-                                <span class="plan-count" id="planPremium">0 members</span>
+                                <span class="plan-count" id="planPremium">0</span>
                             </div>
                             <div class="plan-bar">
-                                <div class="plan-fill premium" style="width: 0%"></div>
+                                <div class="plan-fill premium" id="planPremiumFill" style="width: 0%"></div>
                             </div>
                         </div>
                         <div class="plan-item">
                             <div class="plan-info">
                                 <span class="plan-name">Standard</span>
-                                <span class="plan-count" id="planStandard">0 members</span>
+                                <span class="plan-count" id="planStandard">0</span>
                             </div>
                             <div class="plan-bar">
-                                <div class="plan-fill standard" style="width: 0%"></div>
+                                <div class="plan-fill standard" id="planStandardFill" style="width: 0%"></div>
                             </div>
                         </div>
                         <div class="plan-item">
                             <div class="plan-info">
                                 <span class="plan-name">Basic</span>
-                                <span class="plan-count" id="planBasic">0 members</span>
+                                <span class="plan-count" id="planBasic">0</span>
                             </div>
                             <div class="plan-bar">
-                                <div class="plan-fill basic" style="width: 0%"></div>
+                                <div class="plan-fill basic" id="planBasicFill" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         `
     },
@@ -178,25 +141,24 @@ const moduleData = {
         title: 'Membership',
         content: `
             <div class="membership-container">
-                <!-- Membership Tabs -->
+                <div class="membership-summary" id="membershipSummary"></div>
                 <div class="membership-tabs">
                     <button class="mem-tab active" data-memtab="all-members">
-                        <i class="fas fa-users"></i> All Members
+                        Members
                     </button>
                     <button class="mem-tab" data-memtab="plans">
-                        <i class="fas fa-id-card"></i> Membership Plans
+                        Plans
                     </button>
                     <button class="mem-tab" data-memtab="add-member">
-                        <i class="fas fa-user-plus"></i> Add Member
+                        Add Member
                     </button>
                 </div>
 
-                <!-- Tab Content: All Members -->
                 <div class="mem-tab-content active" id="memTabAllMembers">
                     <div class="mem-toolbar">
                         <div class="mem-search-wrapper">
                             <i class="fas fa-search mem-search-icon"></i>
-                            <input type="text" class="mem-search-input" id="memSearchInput" placeholder="Search by name, email, or phone..." />
+                            <input type="text" class="mem-search-input" id="memSearchInput" placeholder="Search members" />
                         </div>
                         <div class="mem-filter-group">
                             <select class="mem-filter-select" id="memPlanFilter">
@@ -246,91 +208,210 @@ const moduleData = {
                     </div>
                 </div>
 
-                <!-- Tab Content: Membership Plans -->
                 <div class="mem-tab-content" id="memTabPlans">
                     <div class="plans-header">
-                        <h3><i class="fas fa-id-card"></i> Membership Plans</h3>
+                        <h3>Plans</h3>
                         <button class="plans-add-btn" id="plansAddBtn"><i class="fas fa-plus"></i> Add Plan</button>
                     </div>
                     <div class="plans-grid" id="plansGrid">
-                        <!-- Plans rendered by JS -->
                     </div>
                 </div>
 
-                <!-- Tab Content: Add Member -->
                 <div class="mem-tab-content" id="memTabAddMember">
                     <div class="add-member-form-wrapper">
-                        <h3><i class="fas fa-user-plus"></i> Add New Member</h3>
-                        <form id="addMemberForm" class="add-member-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="amFirstName">First Name <span class="required">*</span></label>
-                                    <input type="text" id="amFirstName" class="form-input" placeholder="Enter first name" required />
+                        <h3>Add Member</h3>
+                        <div class="member-wizard">
+                            <div class="member-wizard-steps">
+                                <div class="member-step active" data-step-indicator="1">
+                                    <span class="member-step-number">1</span>
+                                    <span class="member-step-label">Details</span>
                                 </div>
-                                <div class="form-group">
-                                    <label for="amLastName">Last Name <span class="required">*</span></label>
-                                    <input type="text" id="amLastName" class="form-input" placeholder="Enter last name" required />
+                                <div class="member-step" data-step-indicator="2">
+                                    <span class="member-step-number">2</span>
+                                    <span class="member-step-label">Plan</span>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="amEmail">Email <span class="required">*</span></label>
-                                    <input type="email" id="amEmail" class="form-input" placeholder="Enter email address" required />
+                                <div class="member-step" data-step-indicator="3">
+                                    <span class="member-step-number">3</span>
+                                    <span class="member-step-label">Payment</span>
                                 </div>
-                                <div class="form-group">
-                                    <label for="amPhone">Phone <span class="required">*</span></label>
-                                    <input type="text" id="amPhone" class="form-input" placeholder="Enter phone number" required />
+                                <div class="member-step" data-step-indicator="4">
+                                    <span class="member-step-number">4</span>
+                                    <span class="member-step-label">Discount</span>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="amPlan">Membership Plan <span class="required">*</span></label>
-                                    <select id="amPlan" class="form-input" required>
-                                        <option value="">Select a plan</option>
-                                        <option value="Premium">Premium - ₱2,500/month</option>
-                                        <option value="Standard">Standard - ₱1,500/month</option>
-                                        <option value="Basic">Basic - ₱800/month</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="amDuration">Duration <span class="required">*</span></label>
-                                    <select id="amDuration" class="form-input" required>
-                                        <option value="1">1 Month</option>
-                                        <option value="3">3 Months</option>
-                                        <option value="6">6 Months</option>
-                                        <option value="12">12 Months</option>
-                                    </select>
+                                <div class="member-step" data-step-indicator="5">
+                                    <span class="member-step-number">5</span>
+                                    <span class="member-step-label">Finish</span>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="amAddress">Address</label>
-                                    <input type="text" id="amAddress" class="form-input" placeholder="Enter address" />
+
+                            <form id="addMemberForm" class="add-member-form member-wizard-form">
+                                <input type="hidden" id="amPlan" />
+
+                                <div class="wizard-step active" data-step="1">
+                                    <div class="wizard-step-header">
+                                        <h4>Member Details</h4>
+                                        <p>Enter the personal information first.</p>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amFirstName">First Name <span class="required">*</span></label>
+                                            <input type="text" id="amFirstName" class="form-input" placeholder="Enter first name" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amLastName">Last Name <span class="required">*</span></label>
+                                            <input type="text" id="amLastName" class="form-input" placeholder="Enter last name" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amEmail">Email <span class="required">*</span></label>
+                                            <input type="email" id="amEmail" class="form-input" placeholder="Enter email address" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amPhone">Phone <span class="required">*</span></label>
+                                            <input type="text" id="amPhone" class="form-input" placeholder="Enter phone number" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amAddress">Address</label>
+                                            <input type="text" id="amAddress" class="form-input" placeholder="Enter address" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amGender">Gender</label>
+                                            <select id="amGender" class="form-input">
+                                                <option value="">Prefer not to say</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amDOB">Date of Birth</label>
+                                            <input type="date" id="amDOB" class="form-input" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amNotes">Notes</label>
+                                            <textarea id="amNotes" class="form-input form-textarea" placeholder="Any additional notes..."></textarea>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="amGender">Gender</label>
-                                    <select id="amGender" class="form-input">
-                                        <option value="">Prefer not to say</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
+
+                                <div class="wizard-step" data-step="2">
+                                    <div class="wizard-step-header">
+                                        <h4>Membership Plan</h4>
+                                        <p>Choose the plan and duration.</p>
+                                    </div>
+                                    <div class="wizard-plan-grid" id="amPlanOptions"></div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amDuration">Duration <span class="required">*</span></label>
+                                            <select id="amDuration" class="form-input" required disabled>
+                                                <option value="1">Choose a plan first</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Total Before Discount</label>
+                                            <div class="wizard-total-box" id="amPlanSummary">Select a plan first.</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="amDOB">Date of Birth</label>
-                                    <input type="date" id="amDOB" class="form-input" />
+
+                                <div class="wizard-step" data-step="3">
+                                    <div class="wizard-step-header">
+                                        <h4>Payment Verification</h4>
+                                        <p>Select how the member will pay and verify the transaction.</p>
+                                    </div>
+                                    <div class="payment-method-grid">
+                                        <label class="payment-method-card">
+                                            <input type="radio" name="amPaymentMethod" value="gcash" />
+                                            <span class="payment-method-title">GCash</span>
+                                            <span class="payment-method-note">Scan QR then verify the reference number.</span>
+                                        </label>
+                                        <label class="payment-method-card">
+                                            <input type="radio" name="amPaymentMethod" value="paypal" />
+                                            <span class="payment-method-title">PayPal</span>
+                                            <span class="payment-method-note">Use PayPal QR or checkout reference.</span>
+                                        </label>
+                                        <label class="payment-method-card">
+                                            <input type="radio" name="amPaymentMethod" value="cash" />
+                                            <span class="payment-method-title">Cash Only</span>
+                                            <span class="payment-method-note">Verify the cash payment before continuing.</span>
+                                        </label>
+                                    </div>
+                                    <div class="payment-qr-grid">
+                                        <div class="payment-qr-card" data-payment-panel="gcash">
+                                            <div class="payment-qr-pattern"></div>
+                                            <strong>GCash QR</strong>
+                                            <span>Use for wallet payments.</span>
+                                        </div>
+                                        <div class="payment-qr-card" data-payment-panel="paypal">
+                                            <div class="payment-qr-pattern paypal"></div>
+                                            <strong>PayPal QR</strong>
+                                            <span>Use for PayPal checkout.</span>
+                                        </div>
+                                        <div class="payment-qr-card" data-payment-panel="cash">
+                                            <div class="payment-cash-badge"><i class="fas fa-money-bill-wave"></i></div>
+                                            <strong>Cash Payment</strong>
+                                            <span>Accept cash and confirm it below.</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group payment-reference-group" id="amPaymentReferenceGroup">
+                                            <label for="amPaymentReference" id="amPaymentReferenceLabel">Reference Number <span class="required">*</span></label>
+                                            <input type="text" id="amPaymentReference" class="form-input" placeholder="Enter transaction or receipt reference" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amPaymentAmount">Amount Received</label>
+                                            <input type="text" id="amPaymentAmount" class="form-input" placeholder="Auto-calculated" readonly />
+                                        </div>
+                                    </div>
+                                    <label class="payment-verify-check">
+                                        <input type="checkbox" id="amPaymentVerified" />
+                                        <span>Payment has been checked and verified.</span>
+                                    </label>
                                 </div>
-                                <div class="form-group">
-                                    <label for="amNotes">Notes</label>
-                                    <textarea id="amNotes" class="form-input form-textarea" placeholder="Any additional notes..."></textarea>
+
+                                <div class="wizard-step" data-step="4">
+                                    <div class="wizard-step-header">
+                                        <h4>Discount</h4>
+                                        <p>Apply a discount before finishing the registration.</p>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="amDiscountType">Discount Type</label>
+                                            <select id="amDiscountType" class="form-input">
+                                                <option value="none">No Discount</option>
+                                                <option value="student">Student - 10%</option>
+                                                <option value="senior">Senior - 20%</option>
+                                                <option value="promo">Promo - ₱300</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="amDiscountNote">Discount Note</label>
+                                            <input type="text" id="amDiscountNote" class="form-input" placeholder="Optional note or reference" />
+                                        </div>
+                                    </div>
+                                    <div class="discount-summary-card" id="amDiscountSummary"></div>
                                 </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="form-submit-btn"><i class="fas fa-save"></i> Add Member</button>
-                                <button type="reset" class="form-reset-btn"><i class="fas fa-undo"></i> Reset</button>
-                            </div>
-                        </form>
+
+                                <div class="wizard-step" data-step="5">
+                                    <div class="wizard-step-header">
+                                        <h4>Finish</h4>
+                                        <p>Review the information before adding the member.</p>
+                                    </div>
+                                    <div class="wizard-review-grid" id="amReviewContent"></div>
+                                </div>
+
+                                <div class="form-actions wizard-actions">
+                                    <button type="button" class="form-reset-btn" id="amPrevBtn">Back</button>
+                                    <button type="button" class="form-reset-btn" id="amResetWizardBtn">Reset</button>
+                                    <button type="button" class="form-submit-btn" id="amNextBtn">Next</button>
+                                    <button type="submit" class="form-submit-btn" id="amSubmitBtn">Finish & Submit</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -353,18 +434,13 @@ navItems.forEach(item => {
         item.classList.add('active');
         const module = item.dataset.module;
         if (moduleData[module]) {
+            moduleContent.innerHTML = `
+                <h2>${moduleData[module].title}</h2>
+                ${moduleData[module].content}
+            `;
             if (module === 'dashboard') {
-                moduleContent.innerHTML = `
-                    <h2>${moduleData[module].title}</h2>
-                    ${moduleData[module].content}
-                `;
-            } else {
-                moduleContent.innerHTML = `
-                    <h2>${moduleData[module].title}</h2>
-                    ${moduleData[module].content}
-                `;
+                setTimeout(renderDashboardOverview, 50);
             }
-            // Initialize membership module when clicked
             if (module === 'membership') {
                 setTimeout(initMembership, 50);
             }
@@ -784,12 +860,19 @@ function formatDate(d) {
     return `${month}/${day}/${year}`;
 }
 
+function parseDisplayDate(value) {
+    if (!value || !value.includes('/')) return null;
+    const [month, day, year] = value.split('/').map(Number);
+    if (!month || !day || !year) return null;
+    return new Date(year, month - 1, day);
+}
+
 // Plans definition
 const membershipPlans = [
     {
         id: 'plan-premium',
         name: 'Premium',
-        price: 2500,
+        price: 200,
         period: 'month',
         color: '#f5c518',
         features: ['Unlimited gym access', 'Free personal training (4x/month)', 'Access to all classes', 'Free locker & towel', 'Nutrition consultation', 'Priority booking'],
@@ -798,8 +881,8 @@ const membershipPlans = [
     {
         id: 'plan-standard',
         name: 'Standard',
-        price: 1500,
-        period: 'month',
+        price: 120,
+        period: 'week',
         color: '#36a4eb',
         features: ['Unlimited gym access', 'Group classes included', 'Free locker & towel', '1 free PT session/month', 'Access to sauna'],
         popular: false
@@ -807,8 +890,8 @@ const membershipPlans = [
     {
         id: 'plan-basic',
         name: 'Basic',
-        price: 800,
-        period: 'month',
+        price: 80,
+        period: 'day',
         color: '#2ed573',
         features: ['Gym access (6 AM - 12 PM)', 'Basic equipment usage', 'Locker rental available', 'No class access', 'Weekend access'],
         popular: false
@@ -854,6 +937,383 @@ for (let i = 0; i < 20; i++) {
 let membersData = JSON.parse(JSON.stringify(sampleMembers));
 let currentPage = 1;
 const rowsPerPage = 8;
+const addMemberDiscountOptions = {
+    none: { label: 'No discount', type: 'fixed', value: 0 },
+    student: { label: 'Student - 10%', type: 'percent', value: 10 },
+    senior: { label: 'Senior - 20%', type: 'percent', value: 20 },
+    promo: { label: 'Promo - P300', type: 'fixed', value: 300 }
+};
+
+function getMembershipCounts() {
+    const counts = {
+        total: membersData.length,
+        active: 0,
+        expired: 0,
+        pending: 0,
+        revenue: 0,
+        plans: {}
+    };
+
+    membersData.forEach(member => {
+        const price = membershipPlans.find(plan => plan.name === member.plan)?.price || 0;
+        counts.revenue += member.status === 'Active' ? price : 0;
+        counts.plans[member.plan] = (counts.plans[member.plan] || 0) + 1;
+
+        if (member.status === 'Active') counts.active++;
+        if (member.status === 'Expired') counts.expired++;
+        if (member.status === 'Pending') counts.pending++;
+    });
+
+    return counts;
+}
+
+function getExpiringSoonCount() {
+    const today = new Date();
+    const warningWindow = new Date();
+    warningWindow.setDate(today.getDate() + 7);
+
+    return membersData.filter(member => {
+        if (!member.endDate || member.status !== 'Active') return false;
+        const endDate = parseDisplayDate(member.endDate);
+        return endDate && !Number.isNaN(endDate.getTime()) && endDate >= today && endDate <= warningWindow;
+    }).length;
+}
+
+function renderMembershipSummary() {
+    const summary = document.getElementById('membershipSummary');
+    if (!summary) return;
+
+    const counts = getMembershipCounts();
+    summary.innerHTML = `
+        <div class="membership-summary-card">
+            <span class="membership-summary-label">Total</span>
+            <strong class="membership-summary-value">${counts.total}</strong>
+        </div>
+        <div class="membership-summary-card">
+            <span class="membership-summary-label">Active</span>
+            <strong class="membership-summary-value">${counts.active}</strong>
+        </div>
+        <div class="membership-summary-card">
+            <span class="membership-summary-label">Pending</span>
+            <strong class="membership-summary-value">${counts.pending}</strong>
+        </div>
+        <div class="membership-summary-card">
+            <span class="membership-summary-label">Expired</span>
+            <strong class="membership-summary-value">${counts.expired}</strong>
+        </div>
+    `;
+}
+
+function renderDashboardOverview() {
+    const counts = getMembershipCounts();
+    const total = counts.total || 1;
+    const statTotalMembers = document.getElementById('statTotalMembers');
+    const statActiveMembers = document.getElementById('statActiveMembers');
+    const statEarnings = document.getElementById('statEarnings');
+    const statExpiringMembers = document.getElementById('statExpiringMembers');
+
+    if (statTotalMembers) statTotalMembers.textContent = counts.total;
+    if (statActiveMembers) statActiveMembers.textContent = counts.active;
+    if (statEarnings) statEarnings.textContent = `₱${counts.revenue.toLocaleString()}`;
+    if (statExpiringMembers) statExpiringMembers.textContent = getExpiringSoonCount();
+
+    const planKeys = ['Premium', 'Standard', 'Basic'];
+    planKeys.forEach(planName => {
+        const count = counts.plans[planName] || 0;
+        const label = document.getElementById(`plan${planName}`);
+        const fill = document.getElementById(`plan${planName}Fill`);
+        if (label) label.textContent = `${count} members`;
+        if (fill) fill.style.width = `${(count / total) * 100}%`;
+    });
+
+    const activityList = document.getElementById('activityList');
+    if (!activityList) return;
+
+    const latestMembers = [...membersData].slice(0, 4);
+    const activityItems = [
+        { label: `${counts.active} active memberships`, time: 'Current', dot: 'dot-checkin' },
+        { label: `${counts.pending} pending approvals`, time: 'Current', dot: 'dot-payment' },
+        { label: `${counts.expired} expired memberships`, time: 'Current', dot: 'dot-renew' }
+    ];
+
+    if (latestMembers[0]) {
+        activityItems.unshift({
+            label: `${latestMembers[0].firstName} ${latestMembers[0].lastName} is the latest member`,
+            time: latestMembers[0].plan,
+            dot: 'dot-new'
+        });
+    }
+
+    activityList.innerHTML = activityItems.map(item => `
+        <li class="activity-item">
+            <div class="activity-dot ${item.dot}"></div>
+            <div class="activity-info">
+                <p>${item.label}</p>
+                <span class="activity-time">${item.time}</span>
+            </div>
+        </li>
+    `).join('');
+}
+
+function refreshMembershipView() {
+    renderMembershipSummary();
+    renderMembersTable();
+    renderPlans();
+}
+
+function formatCurrency(amount) {
+    return `P${Number(amount || 0).toLocaleString()}`;
+}
+
+function formatPlanPeriod(plan, quantity = 1) {
+    if (!plan) return '';
+    return `${quantity} ${plan.period}${quantity === 1 ? '' : 's'}`;
+}
+
+function syncAddMemberDurationOptions() {
+    const planName = document.getElementById('amPlan')?.value;
+    const plan = membershipPlans.find(item => item.name === planName);
+    const durationSelect = document.getElementById('amDuration');
+    if (!durationSelect) return;
+
+    if (!plan) {
+        durationSelect.innerHTML = '<option value="1">Choose a plan first</option>';
+        durationSelect.disabled = true;
+        return;
+    }
+
+    const currentValue = durationSelect.value;
+    const durations = [1, 3, 6, 12];
+    durationSelect.innerHTML = durations.map(duration =>
+        `<option value="${duration}">${formatPlanPeriod(plan, duration)}</option>`
+    ).join('');
+    durationSelect.value = durations.includes(Number(currentValue)) ? currentValue : '1';
+    durationSelect.disabled = false;
+}
+
+function getAddMemberPricing() {
+    const planName = document.getElementById('amPlan')?.value || '';
+    const duration = parseInt(document.getElementById('amDuration')?.value || '1', 10);
+    const discountKey = document.getElementById('amDiscountType')?.value || 'none';
+    const plan = membershipPlans.find(item => item.name === planName);
+    const subtotal = plan ? plan.price * duration : 0;
+    const discount = addMemberDiscountOptions[discountKey] || addMemberDiscountOptions.none;
+    let discountAmount = discount.type === 'percent'
+        ? subtotal * (discount.value / 100)
+        : discount.value;
+
+    discountAmount = Math.min(discountAmount, subtotal);
+
+    return {
+        plan,
+        duration,
+        subtotal,
+        discountAmount,
+        total: subtotal - discountAmount,
+        discountLabel: discount.label
+    };
+}
+
+function renderAddMemberPlanOptions() {
+    const grid = document.getElementById('amPlanOptions');
+    const hiddenInput = document.getElementById('amPlan');
+    if (!grid || !hiddenInput) return;
+
+    grid.innerHTML = membershipPlans.map(plan => {
+        const isActive = hiddenInput.value === plan.name;
+        return `
+            <button type="button" class="wizard-plan-card ${isActive ? 'active' : ''}" data-plan-value="${plan.name}">
+                <span class="wizard-plan-name">${plan.name}</span>
+                <span class="wizard-plan-price">${formatCurrency(plan.price)} / ${plan.period}</span>
+                <span class="wizard-plan-meta">${plan.features.length} inclusions</span>
+            </button>
+        `;
+    }).join('');
+
+    document.querySelectorAll('.wizard-plan-card').forEach(card => {
+        card.addEventListener('click', function() {
+            hiddenInput.value = this.dataset.planValue;
+            syncAddMemberDurationOptions();
+            renderAddMemberPlanOptions();
+            updateAddMemberWizardSummary();
+        });
+    });
+}
+
+function updatePaymentMethodPanels() {
+    const method = document.querySelector('input[name="amPaymentMethod"]:checked')?.value || '';
+    const referenceLabel = document.getElementById('amPaymentReferenceLabel');
+    const referenceInput = document.getElementById('amPaymentReference');
+    const referenceGroup = document.getElementById('amPaymentReferenceGroup');
+
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        const radio = card.querySelector('input[type="radio"]');
+        card.classList.toggle('active', radio?.checked);
+    });
+
+    document.querySelectorAll('.payment-qr-card').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.paymentPanel === method);
+    });
+
+    if (referenceLabel) {
+        referenceLabel.innerHTML = 'Reference Number <span class="required">*</span>';
+    }
+
+    if (referenceInput) {
+        referenceInput.placeholder = 'Enter transaction reference';
+        referenceInput.disabled = method === 'cash';
+        if (method === 'cash') referenceInput.value = '';
+    }
+
+    if (referenceGroup) referenceGroup.style.display = method === 'cash' ? 'none' : '';
+}
+
+function updateAddMemberWizardSummary() {
+    const pricing = getAddMemberPricing();
+    const planSummary = document.getElementById('amPlanSummary');
+    const paymentAmount = document.getElementById('amPaymentAmount');
+    const discountSummary = document.getElementById('amDiscountSummary');
+    const reviewContent = document.getElementById('amReviewContent');
+    const paymentMethod = document.querySelector('input[name="amPaymentMethod"]:checked')?.value || 'Not selected';
+    const paymentReference = document.getElementById('amPaymentReference')?.value.trim() || '—';
+    const discountNote = document.getElementById('amDiscountNote')?.value.trim() || '—';
+    const fullName = `${document.getElementById('amFirstName')?.value.trim() || ''} ${document.getElementById('amLastName')?.value.trim() || ''}`.trim() || '—';
+
+    if (planSummary) {
+        planSummary.textContent = pricing.plan
+            ? `${pricing.plan.name} for ${formatPlanPeriod(pricing.plan, pricing.duration)} = ${formatCurrency(pricing.subtotal)}`
+            : 'Select a plan first.';
+    }
+
+    if (paymentAmount) {
+        paymentAmount.value = pricing.plan ? formatCurrency(pricing.total) : '';
+    }
+
+    if (discountSummary) {
+        discountSummary.innerHTML = `
+            <div class="discount-summary-row">
+                <span>Subtotal</span>
+                <strong>${formatCurrency(pricing.subtotal)}</strong>
+            </div>
+            <div class="discount-summary-row">
+                <span>${pricing.discountLabel}</span>
+                <strong>- ${formatCurrency(pricing.discountAmount)}</strong>
+            </div>
+            <div class="discount-summary-row total">
+                <span>Total Due</span>
+                <strong>${formatCurrency(pricing.total)}</strong>
+            </div>
+        `;
+    }
+
+    if (reviewContent) {
+        reviewContent.innerHTML = `
+            <div class="wizard-review-card">
+                <span class="wizard-review-label">Member</span>
+                <strong>${fullName}</strong>
+                <span>${document.getElementById('amEmail')?.value.trim() || '—'}</span>
+                <span>${document.getElementById('amPhone')?.value.trim() || '—'}</span>
+            </div>
+            <div class="wizard-review-card">
+                <span class="wizard-review-label">Plan</span>
+                <strong>${pricing.plan?.name || '—'}</strong>
+                <span>${formatPlanPeriod(pricing.plan, pricing.duration) || '—'}</span>
+                <span>${formatCurrency(pricing.subtotal)}</span>
+            </div>
+            <div class="wizard-review-card">
+                <span class="wizard-review-label">Payment</span>
+                <strong>${paymentMethod.toUpperCase()}</strong>
+                <span>${paymentReference}</span>
+                <span>${formatCurrency(pricing.total)}</span>
+            </div>
+            <div class="wizard-review-card">
+                <span class="wizard-review-label">Discount</span>
+                <strong>${pricing.discountLabel}</strong>
+                <span>${discountNote}</span>
+                <span>- ${formatCurrency(pricing.discountAmount)}</span>
+            </div>
+        `;
+    }
+}
+
+function setAddMemberWizardStep(step) {
+    const clampedStep = Math.min(5, Math.max(1, step));
+    const prevBtn = document.getElementById('amPrevBtn');
+    const nextBtn = document.getElementById('amNextBtn');
+    const submitBtn = document.getElementById('amSubmitBtn');
+
+    document.querySelectorAll('.wizard-step').forEach(panel => {
+        panel.classList.toggle('active', Number(panel.dataset.step) === clampedStep);
+    });
+
+    document.querySelectorAll('.member-step').forEach(indicator => {
+        const indicatorStep = Number(indicator.dataset.stepIndicator);
+        indicator.classList.toggle('active', indicatorStep === clampedStep);
+        indicator.classList.toggle('complete', indicatorStep < clampedStep);
+    });
+
+    if (prevBtn) prevBtn.disabled = clampedStep === 1;
+    if (nextBtn) nextBtn.style.display = clampedStep === 5 ? 'none' : 'inline-flex';
+    if (submitBtn) submitBtn.style.display = clampedStep === 5 ? 'inline-flex' : 'none';
+
+    updateAddMemberWizardSummary();
+}
+
+function validateAddMemberWizardStep(step) {
+    if (step === 1) {
+        const requiredIds = ['amFirstName', 'amLastName', 'amEmail', 'amPhone'];
+        for (const id of requiredIds) {
+            const field = document.getElementById(id);
+            if (field && !field.reportValidity()) return false;
+        }
+        return true;
+    }
+
+    if (step === 2) {
+        const plan = document.getElementById('amPlan')?.value;
+        if (!plan) {
+            showToast('Please choose a membership plan.', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    if (step === 3) {
+        const paymentMethod = document.querySelector('input[name="amPaymentMethod"]:checked');
+        const paymentReference = document.getElementById('amPaymentReference');
+        const paymentVerified = document.getElementById('amPaymentVerified');
+
+        if (!paymentMethod) {
+            showToast('Please select a payment method.', 'error');
+            return false;
+        }
+        if (paymentMethod.value !== 'cash' && paymentReference && !paymentReference.value.trim()) {
+            paymentReference.focus();
+            showToast('Please enter the payment reference.', 'error');
+            return false;
+        }
+        if (paymentVerified && !paymentVerified.checked) {
+            showToast('Please verify the payment before continuing.', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    return true;
+}
+
+function resetAddMemberWizard() {
+    const addForm = document.getElementById('addMemberForm');
+    if (!addForm) return;
+
+    addForm.reset();
+    const hiddenPlan = document.getElementById('amPlan');
+    if (hiddenPlan) hiddenPlan.value = '';
+    syncAddMemberDurationOptions();
+    renderAddMemberPlanOptions();
+    updatePaymentMethodPanels();
+    setAddMemberWizardStep(1);
+}
 
 // =====================
 // Render Helpers
@@ -1012,25 +1472,24 @@ function renderPlans() {
     if (!grid) return;
 
     grid.innerHTML = membershipPlans.map(plan => `
-        <div class="plan-card ${plan.popular ? 'plan-popular' : ''}">
-            ${plan.popular ? '<div class="plan-popular-badge">Most Popular</div>' : ''}
-            <div class="plan-card-header" style="border-top: 4px solid ${plan.color};">
-                <h3 class="plan-card-name">${plan.name}</h3>
+        <div class="plan-card" style="border-top: 4px solid ${plan.color};">
+            <div class="plan-card-header">
+                <div>
+                    <h3 class="plan-card-name">${plan.name}</h3>
+                    <p class="plan-card-meta">Per person</p>
+                </div>
                 <div class="plan-card-price">
                     <span class="plan-price-symbol">₱</span>
                     <span class="plan-price-amount">${plan.price.toLocaleString()}</span>
                     <span class="plan-price-period">/${plan.period}</span>
                 </div>
-                <p class="plan-card-desc">Perfect for ${plan.name === 'Premium' ? 'dedicated athletes' : plan.name === 'Standard' ? 'regular fitness goers' : 'beginner and casual users'}</p>
             </div>
             <div class="plan-card-body">
-                <ul class="plan-features">
-                    ${plan.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')}
-                </ul>
+                <span class="plan-inclusion-count">${plan.features.length} inclusions</span>
             </div>
             <div class="plan-card-footer">
                 <button class="plan-select-btn" style="background: ${plan.color}; color: #0d0d0d;" data-plan="${plan.name}">
-                    <i class="fas fa-edit"></i> Manage Plan
+                    <i class="fas fa-edit"></i> Manage
                 </button>
             </div>
         </div>
@@ -1046,7 +1505,7 @@ function renderPlans() {
     // Add Plan button
     const addBtn = document.getElementById('plansAddBtn');
     if (addBtn) {
-        addBtn.addEventListener('click', function() {
+        addBtn.onclick = function() {
             const name = prompt('Enter new plan name:');
             if (name && name.trim()) {
                 const price = prompt(`Enter monthly price for "${name.trim()}":`);
@@ -1065,7 +1524,7 @@ function renderPlans() {
                     alert(`✅ Plan "${name.trim()}" added successfully!`);
                 }
             }
-        });
+        };
     }
 }
 
@@ -1305,7 +1764,7 @@ function editMember(id) {
             notes: document.getElementById('editNotes').value
         };
 
-        renderMembersTable();
+        refreshMembershipView();
         close();
         showToast('Member updated successfully!', 'success');
     });
@@ -1361,7 +1820,7 @@ function deleteMember(id) {
     overlay.querySelector('#confirmDeleteYes').addEventListener('click', function() {
         const delId = parseInt(this.dataset.id);
         membersData = membersData.filter(m => m.id !== delId);
-        renderMembersTable();
+        refreshMembershipView();
         close();
         showToast('Member deleted successfully.', 'info');
     });
@@ -1392,6 +1851,8 @@ function showToast(message, type = 'success') {
 // Initialize Membership
 // =====================
 function initMembership() {
+    renderMembershipSummary();
+
     // Tab switching
     document.querySelectorAll('.mem-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -1458,20 +1919,80 @@ function initMembership() {
     // Add Member form
     const addForm = document.getElementById('addMemberForm');
     if (addForm) {
+        let currentAddMemberStep = 1;
+        const nextBtn = document.getElementById('amNextBtn');
+        const prevBtn = document.getElementById('amPrevBtn');
+        const resetWizardBtn = document.getElementById('amResetWizardBtn');
+
+        syncAddMemberDurationOptions();
+        renderAddMemberPlanOptions();
+        updatePaymentMethodPanels();
+        setAddMemberWizardStep(currentAddMemberStep);
+
+        document.getElementById('amDuration')?.addEventListener('change', updateAddMemberWizardSummary);
+        document.getElementById('amDiscountType')?.addEventListener('change', updateAddMemberWizardSummary);
+        document.getElementById('amDiscountNote')?.addEventListener('input', updateAddMemberWizardSummary);
+        document.getElementById('amPaymentReference')?.addEventListener('input', updateAddMemberWizardSummary);
+        ['amFirstName', 'amLastName', 'amEmail', 'amPhone'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', updateAddMemberWizardSummary);
+        });
+
+        document.querySelectorAll('input[name="amPaymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                updatePaymentMethodPanels();
+                updateAddMemberWizardSummary();
+            });
+        });
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (!validateAddMemberWizardStep(currentAddMemberStep)) return;
+                currentAddMemberStep++;
+                setAddMemberWizardStep(currentAddMemberStep);
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                currentAddMemberStep = Math.max(1, currentAddMemberStep - 1);
+                setAddMemberWizardStep(currentAddMemberStep);
+            });
+        }
+
+        if (resetWizardBtn) {
+            resetWizardBtn.addEventListener('click', () => {
+                currentAddMemberStep = 1;
+                resetAddMemberWizard();
+            });
+        }
+
         addForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            if (!validateAddMemberWizardStep(currentAddMemberStep)) return;
+            if (currentAddMemberStep < 5) {
+                currentAddMemberStep++;
+                setAddMemberWizardStep(currentAddMemberStep);
+                return;
+            }
+
             const firstName = document.getElementById('amFirstName').value.trim();
             const lastName = document.getElementById('amLastName').value.trim();
             const email = document.getElementById('amEmail').value.trim();
             const phone = document.getElementById('amPhone').value.trim();
             const plan = document.getElementById('amPlan').value;
-            const duration = parseInt(document.getElementById('amDuration').value);
+            const duration = parseInt(document.getElementById('amDuration').value, 10);
             const address = document.getElementById('amAddress').value.trim();
             const gender = document.getElementById('amGender').value;
             const dob = document.getElementById('amDOB').value;
             const notes = document.getElementById('amNotes').value.trim();
+            const paymentMethod = document.querySelector('input[name="amPaymentMethod"]:checked')?.value || '';
+            const paymentReference = document.getElementById('amPaymentReference').value.trim();
+            const paymentVerified = document.getElementById('amPaymentVerified').checked;
+            const discountType = document.getElementById('amDiscountType').value;
+            const discountNote = document.getElementById('amDiscountNote').value.trim();
+            const pricing = getAddMemberPricing();
 
-            if (!firstName || !lastName || !email || !phone || !plan) {
+            if (!firstName || !lastName || !email || !phone || !plan || !paymentMethod || !paymentVerified || (paymentMethod !== 'cash' && !paymentReference)) {
                 showToast('Please fill in all required fields.', 'error');
                 return;
             }
@@ -1479,7 +2000,10 @@ function initMembership() {
             const newId = generateMemberId();
             const start = new Date();
             const end = new Date(start);
-            end.setMonth(end.getMonth() + duration);
+            const selectedPlan = membershipPlans.find(item => item.name === plan);
+            if (selectedPlan?.period === 'day') end.setDate(end.getDate() + duration);
+            else if (selectedPlan?.period === 'week') end.setDate(end.getDate() + (duration * 7));
+            else end.setMonth(end.getMonth() + duration);
 
             membersData.unshift({
                 id: newId,
@@ -1495,23 +2019,29 @@ function initMembership() {
                 gender: gender || '—',
                 dob: dob ? formatDate(new Date(dob)) : '—',
                 notes,
-                avatar: null
+                avatar: null,
+                paymentMethod,
+                paymentReference,
+                discountType,
+                discountNote,
+                subtotalAmount: pricing.subtotal,
+                discountAmount: pricing.discountAmount,
+                totalAmount: pricing.total
             });
 
-            // Reset form
-            this.reset();
+            currentAddMemberStep = 1;
+            resetAddMemberWizard();
             // Switch to All Members tab and show the table
             const allMemTab = document.querySelector('.mem-tab[data-memtab="all-members"]');
             if (allMemTab) allMemTab.click();
             currentPage = 1;
-            renderMembersTable();
+            refreshMembershipView();
             showToast(`✅ ${firstName} ${lastName} added as a member!`, 'success');
         });
     }
 
     // Initial render
-    renderMembersTable();
-    renderPlans();
+    refreshMembershipView();
 }
 
 // =====================
