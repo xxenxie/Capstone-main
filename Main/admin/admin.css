@@ -40,6 +40,13 @@ body {
     gap: 15px;
 }
 
+.header-logo {
+    height: 40px;
+    width: auto;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
 /* Hamburger Button */
 .hamburger-btn {
     background: rgba(245, 197, 24, 0.15);
