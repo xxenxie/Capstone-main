@@ -417,13 +417,32 @@ const moduleData = {
             </div>
         `
     },
-    attendance: {
-        title: 'Attendance',
-        content: 'Track and manage member attendance records and check-ins.'
-    },
-    reports: {
-        title: 'Reports',
-        content: 'Generate and view reports on gym performance, membership trends, and more.'
+    history: {
+        title: 'Activity History',
+        content: `
+            <div class="history-shell">
+                <div class="history-intro">
+                    <div>
+                        <h3>Admin activity</h3>
+                        <p>Review membership, plan, and payment actions in one place.</p>
+                    </div>
+                    <button class="mem-refresh-btn" id="historyRefreshBtn" title="Refresh history"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                <div class="history-toolbar">
+                    <div class="mem-search-wrapper">
+                        <i class="fas fa-search mem-search-icon"></i>
+                        <input type="search" class="mem-search-input" id="historySearchInput" placeholder="Search activity" />
+                    </div>
+                    <select class="mem-filter-select" id="historyFilter">
+                        <option value="all">All activity</option>
+                        <option value="member">Members</option>
+                        <option value="plan">Plans</option>
+                        <option value="payment">Payments</option>
+                    </select>
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        `
     }
 };
 
@@ -443,6 +462,9 @@ navItems.forEach(item => {
             }
             if (module === 'membership') {
                 setTimeout(initMembership, 50);
+            }
+            if (module === 'history') {
+                setTimeout(initHistory, 50);
             }
         }
     });
@@ -943,6 +965,56 @@ const addMemberDiscountOptions = {
     senior: { label: 'Senior - 20%', type: 'percent', value: 20 },
     promo: { label: 'Promo - P300', type: 'fixed', value: 300 }
 };
+
+let activityHistory = [
+    { id: 1, type: 'payment', icon: 'fa-receipt', title: 'Membership payments reviewed', detail: 'Payment verification is ready for the latest member records.', timestamp: new Date(Date.now() - 1000 * 60 * 35) },
+    { id: 2, type: 'member', icon: 'fa-user-plus', title: 'Member records loaded', detail: `${membersData.length} member profiles are available to manage.`, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3) },
+    { id: 3, type: 'plan', icon: 'fa-layer-group', title: 'Membership plans configured', detail: `${membershipPlans.length} plans are currently available.`, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) }
+];
+
+function addHistory(type, title, detail, icon) {
+    activityHistory.unshift({ id: Date.now(), type, title, detail, icon, timestamp: new Date() });
+}
+
+function formatHistoryTime(date) {
+    const elapsed = Math.max(0, Date.now() - new Date(date).getTime());
+    const minutes = Math.floor(elapsed / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (!list) return;
+    const query = (document.getElementById('historySearchInput')?.value || '').toLowerCase().trim();
+    const type = document.getElementById('historyFilter')?.value || 'all';
+    const entries = activityHistory.filter(entry => {
+        const matchesType = type === 'all' || entry.type === type;
+        const haystack = `${entry.title} ${entry.detail}`.toLowerCase();
+        return matchesType && (!query || haystack.includes(query));
+    });
+    list.innerHTML = entries.length ? entries.map(entry => `
+        <article class="history-item">
+            <div class="history-icon history-${entry.type}"><i class="fas ${entry.icon}"></i></div>
+            <div class="history-content"><h4>${entry.title}</h4><p>${entry.detail}</p></div>
+            <time>${formatHistoryTime(entry.timestamp)}</time>
+        </article>
+    `).join('') : '<div class="history-empty"><i class="fas fa-filter-circle-xmark"></i><p>No activity matches your filters.</p></div>';
+}
+
+function initHistory() {
+    renderHistory();
+    document.getElementById('historySearchInput')?.addEventListener('input', renderHistory);
+    document.getElementById('historyFilter')?.addEventListener('change', renderHistory);
+    document.getElementById('historyRefreshBtn')?.addEventListener('click', function() {
+        this.classList.add('spinning');
+        renderHistory();
+        setTimeout(() => this.classList.remove('spinning'), 600);
+    });
+}
 
 function getMembershipCounts() {
     const counts = {
@@ -1488,17 +1560,17 @@ function renderPlans() {
                 <span class="plan-inclusion-count">${plan.features.length} inclusions</span>
             </div>
             <div class="plan-card-footer">
-                <button class="plan-select-btn" style="background: ${plan.color}; color: #0d0d0d;" data-plan="${plan.name}">
+                <button class="plan-manage-btn" style="background: ${plan.color}; color: #0d0d0d;" data-plan="${plan.name}">
                     <i class="fas fa-edit"></i> Manage
                 </button>
             </div>
         </div>
     `).join('');
 
-    document.querySelectorAll('.plan-select-btn').forEach(btn => {
+    document.querySelectorAll('.plan-manage-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const planName = this.dataset.plan;
-            alert(`✏️ Edit "${planName}" plan settings (coming soon!)`);
+            const plan = membershipPlans.find(item => item.name === this.dataset.plan);
+            if (plan) openPlanSettingsModal(plan);
         });
     });
 
@@ -1526,6 +1598,43 @@ function renderPlans() {
             }
         };
     }
+}
+
+function openPlanSettingsModal(existingPlan) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mem-modal-overlay';
+    overlay.innerHTML = `<div class="mem-modal plan-settings-modal" role="dialog" aria-modal="true" aria-label="Edit plan settings">
+        <div class="mem-modal-header"><h3><i class="fas fa-sliders"></i> Edit Plan Settings</h3><button class="mem-modal-close" id="planModalClose" aria-label="Close"><i class="fas fa-times"></i></button></div>
+        <form id="planSettingsForm"><div class="mem-modal-body plan-settings-body">
+            <div class="plan-settings-note"><i class="fas fa-circle-info"></i><span>Changes update membership options and dashboard totals.</span></div>
+            <div class="form-row"><div class="form-group"><label for="planSettingName">Plan name <span class="required">*</span></label><input class="form-input" id="planSettingName" value="${existingPlan.name}" required maxlength="40"></div><div class="form-group"><label for="planSettingPrice">Price (PHP) <span class="required">*</span></label><input class="form-input" id="planSettingPrice" type="number" min="0" step="0.01" value="${existingPlan.price}" required></div></div>
+            <div class="form-row"><div class="form-group"><label for="planSettingPeriod">Billing period</label><select class="form-input" id="planSettingPeriod"><option value="day">Per day</option><option value="week">Per week</option><option value="month">Per month</option></select></div><div class="form-group"><label for="planSettingColor">Plan color</label><input class="form-input plan-color-input" id="planSettingColor" type="color" value="${existingPlan.color}"></div></div>
+            <div class="form-group"><label for="planSettingFeatures">Inclusions <span class="plan-field-hint">One item per line</span></label><textarea class="form-input form-textarea" id="planSettingFeatures">${existingPlan.features.join('\n')}</textarea></div>
+            <label class="plan-popular-toggle"><input type="checkbox" id="planSettingPopular" ${existingPlan.popular ? 'checked' : ''}><span>Mark as featured plan</span></label>
+        </div><div class="mem-modal-footer"><button type="button" class="mem-modal-btn mem-modal-cancel-btn" id="planModalCancel">Cancel</button><button type="submit" class="mem-modal-btn mem-modal-save-btn"><i class="fas fa-check"></i> Save Changes</button></div></form></div>`;
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => overlay.classList.add('active'));
+    overlay.querySelector('#planSettingPeriod').value = existingPlan.period;
+    const close = () => { overlay.classList.remove('active'); document.body.style.overflow = ''; setTimeout(() => overlay.remove(), 300); };
+    overlay.querySelector('#planModalClose').addEventListener('click', close);
+    overlay.querySelector('#planModalCancel').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    overlay.querySelector('#planSettingsForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const name = overlay.querySelector('#planSettingName').value.trim();
+        const price = Number(overlay.querySelector('#planSettingPrice').value);
+        const duplicate = membershipPlans.some(plan => plan.name.toLowerCase() === name.toLowerCase() && plan !== existingPlan);
+        if (!name || !Number.isFinite(price) || price < 0 || duplicate) { showToast(duplicate ? 'A plan with that name already exists.' : 'Enter a valid plan name and price.', 'error'); return; }
+        const oldName = existingPlan.name;
+        Object.assign(existingPlan, { name, price, period: overlay.querySelector('#planSettingPeriod').value, color: overlay.querySelector('#planSettingColor').value, features: overlay.querySelector('#planSettingFeatures').value.split('\n').map(item => item.trim()).filter(Boolean), popular: overlay.querySelector('#planSettingPopular').checked });
+        membersData.forEach(member => { if (member.plan === oldName) member.plan = name; });
+        addHistory('plan', `Updated ${name} plan`, `Price set to ${formatCurrency(price)} per ${existingPlan.period}.`, 'fa-pen-to-square');
+        refreshMembershipView();
+        renderDashboardOverview();
+        close();
+        showToast(`${name} plan updated.`, 'success');
+    });
 }
 
 // =====================
@@ -1765,6 +1874,7 @@ function editMember(id) {
         };
 
         refreshMembershipView();
+        addHistory('member', `Updated ${fName} ${lName}`, 'Member profile and membership settings were changed.', 'fa-user-pen');
         close();
         showToast('Member updated successfully!', 'success');
     });
@@ -1820,6 +1930,7 @@ function deleteMember(id) {
     overlay.querySelector('#confirmDeleteYes').addEventListener('click', function() {
         const delId = parseInt(this.dataset.id);
         membersData = membersData.filter(m => m.id !== delId);
+        addHistory('member', `Removed ${member.firstName} ${member.lastName}`, 'The member record was deleted by an administrator.', 'fa-user-minus');
         refreshMembershipView();
         close();
         showToast('Member deleted successfully.', 'info');
@@ -2028,6 +2139,8 @@ function initMembership() {
                 discountAmount: pricing.discountAmount,
                 totalAmount: pricing.total
             });
+
+            addHistory('member', `Added ${firstName} ${lastName}`, `${plan} membership created with ${paymentMethod} payment.`, 'fa-user-plus');
 
             currentAddMemberStep = 1;
             resetAddMemberWizard();

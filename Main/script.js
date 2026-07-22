@@ -57,7 +57,7 @@ loginForm.addEventListener('submit', (e) => {
         // Check credentials
         if (username === VALID_CREDENTIALS.username && password === VALID_CREDENTIALS.password) {
             // Success - redirect to admin panel
-            window.location.href = 'admin/admin.html';
+            window.location.href = 'admin/admin.php';
         } else {
             // Failed - show error
             showError('Invalid username or password');

@@ -2347,6 +2347,35 @@ body {
     border-radius: 0 0 16px 16px;
 }
 
+/* Plan settings and admin history */
+.plan-settings-modal { max-width: 650px; }
+.plan-settings-body { display: flex; flex-direction: column; gap: 16px; }
+.plan-settings-note { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 9px; background: rgba(54, 164, 235, 0.08); border: 1px solid rgba(54, 164, 235, 0.18); color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.45; }
+.plan-settings-note i { color: #36a4eb; margin-top: 2px; }
+.plan-field-hint { float: right; color: rgba(255,255,255,.35); font-size: 11px; font-weight: 400; }
+.plan-color-input { min-height: 43px; padding: 5px; cursor: pointer; }
+.plan-popular-toggle { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.78); font-size: 13px; cursor: pointer; }
+.plan-popular-toggle input { accent-color: #f5c518; width: 16px; height: 16px; }
+
+.history-shell { max-width: 980px; }
+.history-intro, .history-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.history-intro { margin-bottom: 22px; }
+.history-intro h3 { color: #fff; font-size: 19px; margin: 0 0 5px; }
+.history-intro p { margin: 0; color: rgba(255,255,255,.48); font-size: 13px; }
+.history-toolbar { justify-content: flex-start; margin-bottom: 16px; }
+.history-toolbar .mem-search-wrapper { flex: 1; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; padding: 16px; border: 1px solid rgba(255,255,255,.07); border-radius: 12px; background: rgba(255,255,255,.025); }
+.history-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.history-member { background: rgba(46,213,115,.12); color: #2ed573; }
+.history-plan { background: rgba(245,197,24,.12); color: #f5c518; }
+.history-payment { background: rgba(54,164,235,.12); color: #36a4eb; }
+.history-content h4 { margin: 0 0 4px; color: #fff; font-size: 14px; }
+.history-content p, .history-item time { margin: 0; color: rgba(255,255,255,.48); font-size: 12px; }
+.history-item time { white-space: nowrap; }
+.history-empty { text-align: center; padding: 48px 20px; color: rgba(255,255,255,.45); border: 1px dashed rgba(255,255,255,.1); border-radius: 12px; }
+.history-empty i { font-size: 26px; color: #f5c518; margin-bottom: 8px; }
+
 .mem-modal-btn {
     display: flex;
     align-items: center;
@@ -2631,6 +2660,12 @@ body {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .history-intro,
+    .history-toolbar { align-items: stretch; flex-direction: column; }
+
+    .history-item { grid-template-columns: 42px 1fr; }
+    .history-item time { grid-column: 2; }
 }
 
 @media (max-width: 520px) {

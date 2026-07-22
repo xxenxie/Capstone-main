@@ -117,15 +117,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-item" data-module="attendance">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Attendance</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-item" data-module="reports">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Reports</span>
+                        <a href="#" class="nav-item" data-module="history">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <span>History</span>
                         </a>
                     </li>
                 </ul>
