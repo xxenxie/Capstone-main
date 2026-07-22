@@ -149,9 +149,6 @@ const moduleData = {
                     <button class="mem-tab" data-memtab="plans">
                         Plans
                     </button>
-                    <button class="mem-tab" data-memtab="add-member">
-                        Add Member
-                    </button>
                 </div>
 
                 <div class="mem-tab-content active" id="memTabAllMembers">
@@ -175,6 +172,9 @@ const moduleData = {
                             </select>
                             <button class="mem-refresh-btn" id="memRefreshBtn" title="Refresh">
                                 <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="members-add-btn" id="openAddMemberBtn">
+                                <i class="fas fa-user-plus"></i> Add Member
                             </button>
                         </div>
                     </div>
@@ -865,7 +865,7 @@ const memberPhones = [
 ];
 
 // Generate a unique ID
-let memberIdCounter = 20;
+let memberIdCounter = 0;
 function generateMemberId() {
     return ++memberIdCounter;
 }
@@ -956,7 +956,7 @@ for (let i = 0; i < 20; i++) {
 // =====================
 // State
 // =====================
-let membersData = JSON.parse(JSON.stringify(sampleMembers));
+let membersData = [];
 let currentPage = 1;
 const rowsPerPage = 8;
 const addMemberDiscountOptions = {
@@ -966,11 +966,7 @@ const addMemberDiscountOptions = {
     promo: { label: 'Promo - P300', type: 'fixed', value: 300 }
 };
 
-let activityHistory = [
-    { id: 1, type: 'payment', icon: 'fa-receipt', title: 'Membership payments reviewed', detail: 'Payment verification is ready for the latest member records.', timestamp: new Date(Date.now() - 1000 * 60 * 35) },
-    { id: 2, type: 'member', icon: 'fa-user-plus', title: 'Member records loaded', detail: `${membersData.length} member profiles are available to manage.`, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3) },
-    { id: 3, type: 'plan', icon: 'fa-layer-group', title: 'Membership plans configured', detail: `${membershipPlans.length} plans are currently available.`, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) }
-];
+let activityHistory = [];
 
 function addHistory(type, title, detail, icon) {
     activityHistory.unshift({ id: Date.now(), type, title, detail, icon, timestamp: new Date() });
@@ -1459,8 +1455,8 @@ function renderMembersTable() {
                 <td colspan="7" class="mem-empty-row">
                     <div class="mem-empty-state">
                         <i class="fas fa-users-slash"></i>
-                        <p>No members found</p>
-                        <span>Try adjusting your search or filters</span>
+                        <p>No members yet</p>
+                        <span>Use Add Member to create your first member record.</span>
                     </div>
                 </td>
             </tr>
@@ -1544,11 +1540,14 @@ function renderPlans() {
     if (!grid) return;
 
     grid.innerHTML = membershipPlans.map(plan => `
-        <div class="plan-card" style="border-top: 4px solid ${plan.color};">
+        <div class="plan-card ${plan.popular ? 'is-featured' : ''}" style="--plan-color: ${plan.color};">
             <div class="plan-card-header">
                 <div>
-                    <h3 class="plan-card-name">${plan.name}</h3>
-                    <p class="plan-card-meta">Per person</p>
+                    <div class="plan-title-row">
+                        <h3 class="plan-card-name">${plan.name}</h3>
+                        ${plan.popular ? '<span class="plan-featured-badge"><i class="fas fa-star"></i> Featured</span>' : ''}
+                    </div>
+                    <p class="plan-card-meta">Membership plan</p>
                 </div>
                 <div class="plan-card-price">
                     <span class="plan-price-symbol">₱</span>
@@ -1557,7 +1556,11 @@ function renderPlans() {
                 </div>
             </div>
             <div class="plan-card-body">
-                <span class="plan-inclusion-count">${plan.features.length} inclusions</span>
+                <span class="plan-inclusion-count"><i class="fas fa-list-check"></i> ${plan.features.length} inclusions</span>
+                <ul class="plan-feature-list">
+                    ${plan.features.slice(0, 3).map(feature => `<li><i class="fas fa-check"></i>${feature}</li>`).join('')}
+                    ${plan.features.length > 3 ? `<li class="plan-more-features">+${plan.features.length - 3} more benefits</li>` : ''}
+                </ul>
             </div>
             <div class="plan-card-footer">
                 <button class="plan-manage-btn" style="background: ${plan.color}; color: #0d0d0d;" data-plan="${plan.name}">
@@ -1593,29 +1596,32 @@ function renderPlans() {
                     };
                     membershipPlans.push(newPlan);
                     renderPlans();
-                    alert(`✅ Plan "${name.trim()}" added successfully!`);
+                    showToast(`${name.trim()} plan created.`, 'success');
                 }
             }
         };
     }
+    if (addBtn) addBtn.onclick = () => openPlanSettingsModal();
 }
 
-function openPlanSettingsModal(existingPlan) {
+function openPlanSettingsModal(existingPlan = null) {
+    const isNewPlan = !existingPlan;
+    const planData = existingPlan || { name: '', price: '', period: 'month', color: '#a855f7', features: [], popular: false };
     const overlay = document.createElement('div');
     overlay.className = 'mem-modal-overlay';
-    overlay.innerHTML = `<div class="mem-modal plan-settings-modal" role="dialog" aria-modal="true" aria-label="Edit plan settings">
-        <div class="mem-modal-header"><h3><i class="fas fa-sliders"></i> Edit Plan Settings</h3><button class="mem-modal-close" id="planModalClose" aria-label="Close"><i class="fas fa-times"></i></button></div>
+    overlay.innerHTML = `<div class="mem-modal plan-settings-modal" role="dialog" aria-modal="true" aria-label="${isNewPlan ? 'Create plan' : 'Edit plan settings'}">
+        <div class="mem-modal-header"><h3><i class="fas fa-sliders"></i> ${isNewPlan ? 'Create Plan' : 'Edit Plan Settings'}</h3><button class="mem-modal-close" id="planModalClose" aria-label="Close"><i class="fas fa-times"></i></button></div>
         <form id="planSettingsForm"><div class="mem-modal-body plan-settings-body">
             <div class="plan-settings-note"><i class="fas fa-circle-info"></i><span>Changes update membership options and dashboard totals.</span></div>
-            <div class="form-row"><div class="form-group"><label for="planSettingName">Plan name <span class="required">*</span></label><input class="form-input" id="planSettingName" value="${existingPlan.name}" required maxlength="40"></div><div class="form-group"><label for="planSettingPrice">Price (PHP) <span class="required">*</span></label><input class="form-input" id="planSettingPrice" type="number" min="0" step="0.01" value="${existingPlan.price}" required></div></div>
-            <div class="form-row"><div class="form-group"><label for="planSettingPeriod">Billing period</label><select class="form-input" id="planSettingPeriod"><option value="day">Per day</option><option value="week">Per week</option><option value="month">Per month</option></select></div><div class="form-group"><label for="planSettingColor">Plan color</label><input class="form-input plan-color-input" id="planSettingColor" type="color" value="${existingPlan.color}"></div></div>
-            <div class="form-group"><label for="planSettingFeatures">Inclusions <span class="plan-field-hint">One item per line</span></label><textarea class="form-input form-textarea" id="planSettingFeatures">${existingPlan.features.join('\n')}</textarea></div>
-            <label class="plan-popular-toggle"><input type="checkbox" id="planSettingPopular" ${existingPlan.popular ? 'checked' : ''}><span>Mark as featured plan</span></label>
-        </div><div class="mem-modal-footer"><button type="button" class="mem-modal-btn mem-modal-cancel-btn" id="planModalCancel">Cancel</button><button type="submit" class="mem-modal-btn mem-modal-save-btn"><i class="fas fa-check"></i> Save Changes</button></div></form></div>`;
+            <div class="form-row"><div class="form-group"><label for="planSettingName">Plan name <span class="required">*</span></label><input class="form-input" id="planSettingName" value="${planData.name}" required maxlength="40"></div><div class="form-group"><label for="planSettingPrice">Price (PHP) <span class="required">*</span></label><input class="form-input" id="planSettingPrice" type="number" min="0" step="0.01" value="${planData.price}" required></div></div>
+            <div class="form-row"><div class="form-group"><label for="planSettingPeriod">Billing period</label><select class="form-input" id="planSettingPeriod"><option value="day">Per day</option><option value="week">Per week</option><option value="month">Per month</option></select></div><div class="form-group"><label for="planSettingColor">Plan color</label><input class="form-input plan-color-input" id="planSettingColor" type="color" value="${planData.color}"></div></div>
+            <div class="form-group"><label for="planSettingFeatures">Inclusions <span class="plan-field-hint">One item per line</span></label><textarea class="form-input form-textarea" id="planSettingFeatures">${planData.features.join('\n')}</textarea></div>
+            <label class="plan-popular-toggle"><input type="checkbox" id="planSettingPopular" ${planData.popular ? 'checked' : ''}><span>Mark as featured plan</span></label>
+        </div><div class="mem-modal-footer"><button type="button" class="mem-modal-btn mem-modal-cancel-btn" id="planModalCancel">Cancel</button><button type="submit" class="mem-modal-btn mem-modal-save-btn"><i class="fas fa-check"></i> ${isNewPlan ? 'Create Plan' : 'Save Changes'}</button></div></form></div>`;
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => overlay.classList.add('active'));
-    overlay.querySelector('#planSettingPeriod').value = existingPlan.period;
+    overlay.querySelector('#planSettingPeriod').value = planData.period;
     const close = () => { overlay.classList.remove('active'); document.body.style.overflow = ''; setTimeout(() => overlay.remove(), 300); };
     overlay.querySelector('#planModalClose').addEventListener('click', close);
     overlay.querySelector('#planModalCancel').addEventListener('click', close);
@@ -1626,14 +1632,20 @@ function openPlanSettingsModal(existingPlan) {
         const price = Number(overlay.querySelector('#planSettingPrice').value);
         const duplicate = membershipPlans.some(plan => plan.name.toLowerCase() === name.toLowerCase() && plan !== existingPlan);
         if (!name || !Number.isFinite(price) || price < 0 || duplicate) { showToast(duplicate ? 'A plan with that name already exists.' : 'Enter a valid plan name and price.', 'error'); return; }
-        const oldName = existingPlan.name;
-        Object.assign(existingPlan, { name, price, period: overlay.querySelector('#planSettingPeriod').value, color: overlay.querySelector('#planSettingColor').value, features: overlay.querySelector('#planSettingFeatures').value.split('\n').map(item => item.trim()).filter(Boolean), popular: overlay.querySelector('#planSettingPopular').checked });
-        membersData.forEach(member => { if (member.plan === oldName) member.plan = name; });
-        addHistory('plan', `Updated ${name} plan`, `Price set to ${formatCurrency(price)} per ${existingPlan.period}.`, 'fa-pen-to-square');
+        const planValues = { name, price, period: overlay.querySelector('#planSettingPeriod').value, color: overlay.querySelector('#planSettingColor').value, features: overlay.querySelector('#planSettingFeatures').value.split('\n').map(item => item.trim()).filter(Boolean), popular: overlay.querySelector('#planSettingPopular').checked };
+        if (isNewPlan) {
+            membershipPlans.push({ id: `plan-${Date.now()}`, ...planValues });
+            addHistory('plan', `Created ${name} plan`, `New plan created at ${formatCurrency(price)} per ${planValues.period}.`, 'fa-circle-plus');
+        } else {
+            const oldName = existingPlan.name;
+            Object.assign(existingPlan, planValues);
+            membersData.forEach(member => { if (member.plan === oldName) member.plan = name; });
+            addHistory('plan', `Updated ${name} plan`, `Price set to ${formatCurrency(price)} per ${existingPlan.period}.`, 'fa-pen-to-square');
+        }
         refreshMembershipView();
         renderDashboardOverview();
         close();
-        showToast(`${name} plan updated.`, 'success');
+        showToast(`${name} plan ${isNewPlan ? 'created' : 'updated'}.`, 'success');
     });
 }
 
@@ -1958,11 +1970,40 @@ function showToast(message, type = 'success') {
     }, 3500);
 }
 
+function openAddMemberModal() {
+    const addMemberContent = document.getElementById('memTabAddMember');
+    if (!addMemberContent || document.querySelector('.add-member-modal')) return;
+
+    const placeholder = document.createComment('add-member-modal-placeholder');
+    addMemberContent.parentNode.insertBefore(placeholder, addMemberContent);
+    const overlay = document.createElement('div');
+    overlay.className = 'mem-modal-overlay';
+    overlay.innerHTML = `<div class="mem-modal add-member-modal" role="dialog" aria-modal="true" aria-labelledby="addMemberModalTitle"><div class="mem-modal-header"><h3 id="addMemberModalTitle"><i class="fas fa-user-plus"></i> Add Member</h3><button class="mem-modal-close" id="addMemberModalClose" aria-label="Close"><i class="fas fa-times"></i></button></div><div class="mem-modal-body member-modal-body"></div></div>`;
+    const modalBody = overlay.querySelector('.member-modal-body');
+    addMemberContent.classList.add('active');
+    modalBody.appendChild(addMemberContent);
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => overlay.classList.add('active'));
+
+    const close = () => {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        addMemberContent.classList.remove('active');
+        placeholder.replaceWith(addMemberContent);
+        setTimeout(() => overlay.remove(), 300);
+    };
+    overlay.querySelector('#addMemberModalClose').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+}
+
 // =====================
 // Initialize Membership
 // =====================
 function initMembership() {
     renderMembershipSummary();
+
+    document.getElementById('openAddMemberBtn')?.addEventListener('click', openAddMemberModal);
 
     // Tab switching
     document.querySelectorAll('.mem-tab').forEach(tab => {
@@ -2150,6 +2191,7 @@ function initMembership() {
             currentPage = 1;
             refreshMembershipView();
             showToast(`✅ ${firstName} ${lastName} added as a member!`, 'success');
+            document.getElementById('addMemberModalClose')?.click();
         });
     }
 
