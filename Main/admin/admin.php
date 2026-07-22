@@ -13,7 +13,7 @@
             <button class="hamburger-btn" id="hamburgerBtn" title="Toggle Sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <img src="../image/Logo.jpg" alt="Brusko Gym Logo" class="header-logo" />
+            <img src="../../image/Logo.jpg" alt="Brusko Gym Logo" class="header-logo" />
             <h1 class="gym-name">Brusko Gym</h1>
         </div>
         <div class="header-right">
